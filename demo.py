@@ -21,7 +21,7 @@ import torch
 import argparse
 
 """hyper parameters"""
-use_cuda = True
+
 
 def detect_cv2(cfgfile, weightfile, imgfile):
     import cv2
@@ -31,8 +31,7 @@ def detect_cv2(cfgfile, weightfile, imgfile):
     m.load_weights(weightfile)
     print('Loading weights from %s... Done!' % (weightfile))
 
-    if use_cuda:
-        m.cuda()
+    m = m.to(device())
 
     num_classes = m.num_classes
     if num_classes == 20:
@@ -49,12 +48,13 @@ def detect_cv2(cfgfile, weightfile, imgfile):
 
     for i in range(2):
         start = time.time()
-        boxes = do_detect(m, sized, 0.4, 0.6, use_cuda)
+        boxes = do_detect(m, sized, 0.4, 0.6, device())
         finish = time.time()
         if i == 1:
             print('%s: Predicted in %f seconds.' % (imgfile, (finish - start)))
 
-    plot_boxes_cv2(img, boxes[0], savename='predictions.jpg', class_names=class_names)
+    plot_boxes_cv2(
+        img, boxes[0], savename='predictions.jpg', class_names=class_names)
 
 
 def detect_cv2_camera(cfgfile, weightfile):
@@ -68,8 +68,7 @@ def detect_cv2_camera(cfgfile, weightfile):
         m.load_weights(weightfile)
     print('Loading weights from %s... Done!' % (weightfile))
 
-    if use_cuda:
-        m.cuda()
+    m.to(device())
 
     cap = cv2.VideoCapture(0)
     # cap = cv2.VideoCapture("./test.mp4")
@@ -92,11 +91,12 @@ def detect_cv2_camera(cfgfile, weightfile):
         sized = cv2.cvtColor(sized, cv2.COLOR_BGR2RGB)
 
         start = time.time()
-        boxes = do_detect(m, sized, 0.4, 0.6, use_cuda)
+        boxes = do_detect(m, sized, 0.4, 0.6, device())
         finish = time.time()
         print('Predicted in %f seconds.' % (finish - start))
 
-        result_img = plot_boxes_cv2(img, boxes[0], savename=None, class_names=class_names)
+        result_img = plot_boxes_cv2(
+            img, boxes[0], savename=None, class_names=class_names)
 
         cv2.imshow('Yolo demo', result_img)
         cv2.waitKey(1)
@@ -113,8 +113,7 @@ def detect_skimage(cfgfile, weightfile, imgfile):
     m.load_weights(weightfile)
     print('Loading weights from %s... Done!' % (weightfile))
 
-    if use_cuda:
-        m.cuda()
+    m.to(device())
 
     num_classes = m.num_classes
     if num_classes == 20:
@@ -130,16 +129,18 @@ def detect_skimage(cfgfile, weightfile, imgfile):
 
     for i in range(2):
         start = time.time()
-        boxes = do_detect(m, sized, 0.4, 0.4, use_cuda)
+        boxes = do_detect(m, sized, 0.4, 0.4, device())
         finish = time.time()
         if i == 1:
             print('%s: Predicted in %f seconds.' % (imgfile, (finish - start)))
 
-    plot_boxes_cv2(img, boxes, savename='predictions.jpg', class_names=class_names)
+    plot_boxes_cv2(img, boxes, savename='predictions.jpg',
+                   class_names=class_names)
 
 
 def get_args():
-    parser = argparse.ArgumentParser('Test your image or video by trained model.')
+    parser = argparse.ArgumentParser(
+        'Test your image or video by trained model.')
     parser.add_argument('-cfgfile', type=str, default='./cfg/yolov4.cfg',
                         help='path of cfg file', dest='cfgfile')
     parser.add_argument('-weightfile', type=str,

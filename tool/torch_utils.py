@@ -12,6 +12,14 @@ import imghdr  # get_image_size
 
 from tool import utils 
 
+def device():
+    return torch.device(
+        "cuda"
+        if torch.cuda.is_available()
+        else "mps"
+        if torch.backends.mps.is_available()
+        else "cpu"
+    )
 
 def bbox_ious(boxes1, boxes2, x1y1x2y2=True):
     if x1y1x2y2:
@@ -73,7 +81,7 @@ def convert2cpu_long(gpu_matrix):
 
 
 
-def do_detect(model, img, conf_thresh, nms_thresh, use_cuda=1):
+def do_detect(model, img, conf_thresh, nms_thresh, device):
     model.eval()
     with torch.no_grad():
         t0 = time.time()
@@ -86,8 +94,7 @@ def do_detect(model, img, conf_thresh, nms_thresh, use_cuda=1):
             print("unknow image type")
             exit(-1)
 
-        if use_cuda:
-            img = img.cuda()
+        img = img.to(device)
         img = torch.autograd.Variable(img)
 
         t1 = time.time()

@@ -67,11 +67,6 @@ def yolo_forward(output, conf_thresh, num_classes, anchors, num_anchors, scale_x
         anchor_w.append(anchors[i * 2])
         anchor_h.append(anchors[i * 2 + 1])
 
-    device = None
-    cuda_check = output.is_cuda
-    if cuda_check:
-        device = output.get_device()
-
     bx_list = []
     by_list = []
     bw_list = []
@@ -81,9 +76,9 @@ def yolo_forward(output, conf_thresh, num_classes, anchors, num_anchors, scale_x
     for i in range(num_anchors):
         ii = i * 2
         # Shape: [batch, 1, H, W]
-        bx = bxy[:, ii : ii + 1] + torch.tensor(grid_x, device=device, dtype=torch.float32) # grid_x.to(device=device, dtype=torch.float32)
+        bx = bxy[:, ii : ii + 1] + torch.tensor(grid_x, device=device(), dtype=torch.float32) # grid_x.to(device=device, dtype=torch.float32)
         # Shape: [batch, 1, H, W]
-        by = bxy[:, ii + 1 : ii + 2] + torch.tensor(grid_y, device=device, dtype=torch.float32) # grid_y.to(device=device, dtype=torch.float32)
+        by = bxy[:, ii + 1 : ii + 2] + torch.tensor(grid_y, device=device(), dtype=torch.float32) # grid_y.to(device=device, dtype=torch.float32)
         # Shape: [batch, 1, H, W]
         bw = bwh[:, ii : ii + 1] * anchor_w[i]
         # Shape: [batch, 1, H, W]
@@ -210,11 +205,6 @@ def yolo_forward_dynamic(output, conf_thresh, num_classes, anchors, num_anchors,
         anchor_w.append(anchors[i * 2])
         anchor_h.append(anchors[i * 2 + 1])
 
-    device = None
-    cuda_check = output.is_cuda
-    if cuda_check:
-        device = output.get_device()
-
     bx_list = []
     by_list = []
     bw_list = []
@@ -224,9 +214,9 @@ def yolo_forward_dynamic(output, conf_thresh, num_classes, anchors, num_anchors,
     for i in range(num_anchors):
         ii = i * 2
         # Shape: [batch, 1, H, W]
-        bx = bxy[:, ii : ii + 1] + torch.tensor(grid_x, device=device, dtype=torch.float32) # grid_x.to(device=device, dtype=torch.float32)
+        bx = bxy[:, ii : ii + 1] + torch.tensor(grid_x, device=device(), dtype=torch.float32) # grid_x.to(device=device, dtype=torch.float32)
         # Shape: [batch, 1, H, W]
-        by = bxy[:, ii + 1 : ii + 2] + torch.tensor(grid_y, device=device, dtype=torch.float32) # grid_y.to(device=device, dtype=torch.float32)
+        by = bxy[:, ii + 1 : ii + 2] + torch.tensor(grid_y, device=device(), dtype=torch.float32) # grid_y.to(device=device, dtype=torch.float32)
         # Shape: [batch, 1, H, W]
         bw = bwh[:, ii : ii + 1] * anchor_w[i]
         # Shape: [batch, 1, H, W]
